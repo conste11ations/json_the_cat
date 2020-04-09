@@ -15,9 +15,10 @@ describe('fetchBreedDescription', () => {
     });
   });
   it('test the scenario where an invalid/non-existent breed is passed in', (done) => {
-    fetchBreedDescription('SSSSSS', (err) => {
+    fetchBreedDescription('SSSSSS', (err, desc) => {
       // we expect no error for this scenario
       assert.equal(err, "result not found");
+      assert.equal(desc, null);
       done();
     });
   });
