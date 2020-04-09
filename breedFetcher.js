@@ -1,24 +1,33 @@
 const request = require('request');
-const userInput = process.argv.slice(2);
 
-request('https://api.thecatapi.com/v1/breeds/search?q='.concat(userInput[0]), (errorMain, response, body) => {
-  const data = JSON.parse(body);
-  if (response.statusCode !== 200) { // HTTP code error
-    console.log(response.statusCode);
-    console.log(data);
-  } else {
-    try {
-      if (data.length !== 0) {  // happy path
-        console.log("result: ", data);
-        console.log("result type: ", typeof data);
-        console.log("desc: ",data[0].description);
-      } else { // status 200 but no results
-        console.log('statusCode:', response && response.statusCode);
-        console.log("result not found");
+/* Refactor the code in breedFetcher.js by moving the main request logic into a function named fetchBreedDescription.
+
+This function should call the callback with either an error if there's a error or null if there isn't, for the first argument.
+The table below shows in more detail what to pass into callback for each of the two scenarios.
+
+outcome	| error value   	               | description value
+success	|   null	                       | (the description from body)
+failure	|(the error we get from request) |	null
+*/
+const fetchBreedDescription = function(breedName, callback) {
+  request('https://api.thecatapi.com/v1/breeds/search?q='.concat(breedName), (errorMain, response, body) => {
+    const data = JSON.parse(body);
+    if (response.statusCode !== 200) { // HTTP code error
+      return callback(data);
+    } else {
+      try {
+        if (data.length !== 0) {  // happy path
+          return callback(null, data);
+        } else { // status 200 but no results
+          return callback("result not found");
+        }
+      } catch (error) { // other errors
+        return callback(error);
       }
-    } catch (error) { // other errors
-      console.log('error:', error.message);
-      console.log('statusCode:', response && response.statusCode);
     }
-  }
-});
+  });
+
+};
+
+
+module.exports = { fetchBreedDescription };
