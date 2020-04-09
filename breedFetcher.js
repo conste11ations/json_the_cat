@@ -17,7 +17,7 @@ const fetchBreedDescription = function(breedName, callback) {
     } else {
       try {
         if (data.length !== 0) {  // happy path
-          return callback(null, data);
+          return callback(null, data[0].description.trim());
         } else { // status 200 but no results
           return callback("result not found");
         }
